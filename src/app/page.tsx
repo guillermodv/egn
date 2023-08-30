@@ -1,14 +1,9 @@
 "use client";
 import results from "./data/results.json";
-import {
-  GeneralResult,
-  EstadoRecuento,
-  ValoresTotalizadosOtros,
-} from "./components/interfaces";
-import MyLineChart from "./components/myLineChart";
-import { Pie } from "react-chartjs-2";
-import { PieChart } from "./components/pieChart";
-import { AreaChart } from "./components/areaChart";
+import { GeneralResult } from "./components/interfaces";
+import { PieChartGeneral } from "./components/pieChartGeneral";
+import { PorcentPieChart } from "./components/porcentPieChart";
+import { useCallback } from "react";
 
 export default function Home() {
   const answerForServer: GeneralResult = results;
@@ -20,45 +15,19 @@ export default function Home() {
     valoresTotalizadosOtros,
   } = answerForServer;
 
-  const data = {
-    labels: [
-      "FRENTE DE TODOS",
-      "UNITE POR LA LIBERTAD",
-      "FRENTE IZQUIERDA",
-      "EL MOVIMIENTO",
-      "OTRO",
-      "OTRO 2",
-    ],
-    datasets: [
-      {
-        label: "Numero de votos",
-        data: [12, 19, 3, 5, 2, 3],
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.2)",
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(153, 102, 255, 0.2)",
-          "rgba(255, 159, 64, 0.2)",
-        ],
-        borderColor: [
-          "rgba(255, 99, 132, 1)",
-          "rgba(54, 162, 235, 1)",
-          "rgba(255, 206, 86, 1)",
-          "rgba(75, 192, 192, 1)",
-          "rgba(153, 102, 255, 1)",
-          "rgba(255, 159, 64, 1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
+  const dataPieLabels = valoresTotalizadosPositivos.map(
+    (valor) => valor.nombreAgrupacion
+  );
+
+  const dataPieValues = valoresTotalizadosPositivos.map(
+    (valor) => valor.votosPorcentaje
+  );
 
   return (
-    <section className="flex flex-row items-center justify-center">
+    <section className="flex p-4 flex-row items-center justify-center">
       <article>
-        <div>
-          <p className="py-4 text-3xl font-bold">
+        <div className="p-4">
+          <p className="py-4 text-3xl text-center font-bold">
             Elecciones 2023 -{" "}
             {new Date(fechaTotalizacion).toLocaleDateString("es", {
               weekday: "long",
@@ -70,22 +39,32 @@ export default function Home() {
             })}
           </p>
         </div>
-        <div>
-          <p className="py-4 text-2xl font-bold">Estado de Recuento</p>
+        <figure className="flex bg-sky-100 rounded-xl p-8 md:p-0 ">
+          <p className="py-4 text-1xl font-bold">Estado de Recuento</p>
           <div>Mesas esperadas: {estadoRecuento.mesasEsperadas}</div>
           <div>Mesas totalizadas: {estadoRecuento.mesasTotalizadas}</div>
           <div>
             Porcentaje Totalizado: {estadoRecuento.mesasTotalizadasPorcentaje} %
           </div>
-        </div>
-        <div>
-          <p className="py-4 text-2xl font-bold">Totalizaciones</p>
+          <div>
+            <PorcentPieChart
+              dataPieLabels={["si", "no"]}
+              dataPieValues={[
+                estadoRecuento.mesasTotalizadasPorcentaje,
+                100 - estadoRecuento.mesasTotalizadasPorcentaje,
+              ]}
+              dataPieTitle="Porcentaje totalizado"
+            />
+          </div>
+        </figure>
+        <figure className="flex bg-sky-100 rounded-xl p-8 md:p-0 ">
+          <p className="py-4 text-1xl font-bold">Totalizaciones</p>
           <div>Cantidad De Electores: {estadoRecuento.cantidadElectores}</div>
           <div>Cantidad de Votantes: {estadoRecuento.cantidadVotantes}</div>
           <div>Participacion: {estadoRecuento.participacionPorcentaje} %</div>
-        </div>
-        <div>
-          <p className="py-4 text-2xl font-bold">
+        </figure>
+        <figure className="flex bg-sky-100 rounded-xl p-8 md:p-0 ">
+          <p className="py-4 text-1xl font-bold">
             Valores ValoresTotalizados Otros
           </p>
           <div>
@@ -105,11 +84,26 @@ export default function Home() {
             {valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje}
             %
           </div>
-        </div>
+          <div>
+            <PorcentPieChart
+              dataPieLabels={["si", "no"]}
+              dataPieValues={[
+                valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje,
+                100 -
+                  valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje,
+              ]}
+              dataPieTitle="Porcentaje totalizado"
+            />
+          </div>
+        </figure>
         <div>
-          <MyLineChart />
-          <PieChart data={data} />
-          <AreaChart />
+          {/* <MyLineChart data={data2} /> */}
+          <PieChartGeneral
+            dataPieTitle={"Porcentaje de votos"}
+            dataPieLabels={dataPieLabels}
+            dataPieValues={dataPieValues}
+          />
+          {/*  <AreaChart />*/}
         </div>
       </article>
     </section>
