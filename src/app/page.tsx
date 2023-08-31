@@ -1,12 +1,26 @@
 "use client";
-import results from "./data/results.json";
-import { GeneralResult } from "./components/interfaces";
+import { useEffect, useState } from "react";
+import {
+  GeneralResult,
+  ValoresTotalizadosOtros,
+} from "./components/interfaces";
 import { PieChartGeneral } from "./components/pieChartGeneral";
 import { PorcentPieChart } from "./components/porcentPieChart";
-import { useCallback } from "react";
+import LoadingIndicator from "./components/loadingIndicator";
+import TitleMain from "./components/titleMain";
+
+const url =
+  "https://resultados.mininterior.gob.ar/api/resultados/getResultados?anioEleccion=2019&tipoRecuento=1&tipoEleccion=1&categoriaId=2&distritoId=1&seccionProvincialId=0&seccionId=3&circuitoId=000039&mesaId=1244";
 
 export default function Home() {
-  const answerForServer: GeneralResult = results;
+  const [arrivedData, setArrivedData] = useState([]);
+
+  useEffect(() => {
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => setArrivedData(data));
+  }, []);
+  const answerForServer: any = arrivedData;
 
   const {
     fechaTotalizacion,
@@ -15,97 +29,204 @@ export default function Home() {
     valoresTotalizadosOtros,
   } = answerForServer;
 
-  const dataPieLabels = valoresTotalizadosPositivos.map(
-    (valor) => valor.nombreAgrupacion
+  const dataPieLabels = valoresTotalizadosPositivos?.map(
+    (valor: any) => valor.nombreAgrupacion
   );
 
-  const dataPieValues = valoresTotalizadosPositivos.map(
-    (valor) => valor.votosPorcentaje
+  const dataPieValues = valoresTotalizadosPositivos?.map(
+    (valor: any) => valor.votosPorcentaje
   );
 
   return (
-    <section className="flex p-4 flex-row items-center justify-center">
-      <article>
-        <div className="p-4">
-          <p className="py-4 text-3xl text-center font-bold">
-            Elecciones 2023 -{" "}
-            {new Date(fechaTotalizacion).toLocaleDateString("es", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-            })}
-          </p>
-        </div>
-        <figure className="flex bg-sky-100 rounded-xl p-8 md:p-0 ">
-          <p className="py-4 text-1xl font-bold">Estado de Recuento</p>
-          <div>Mesas esperadas: {estadoRecuento.mesasEsperadas}</div>
-          <div>Mesas totalizadas: {estadoRecuento.mesasTotalizadas}</div>
-          <div>
-            Porcentaje Totalizado: {estadoRecuento.mesasTotalizadasPorcentaje} %
+    <section className="flex p-4 items-center justify-center">
+      {answerForServer?.length === 0 && <LoadingIndicator />}
+      {answerForServer?.length !== 0 && (
+        <article className="flex flex-col gap-4 w-100">
+          <div className="p-4 uppercase">
+            <TitleMain fechaTotalizacion={fechaTotalizacion} />
           </div>
-          <div>
-            <PorcentPieChart
-              dataPieLabels={["si", "no"]}
-              dataPieValues={[
-                estadoRecuento.mesasTotalizadasPorcentaje,
-                100 - estadoRecuento.mesasTotalizadasPorcentaje,
-              ]}
-              dataPieTitle="Porcentaje totalizado"
-            />
+          <div className="flex flex-row gap-4">
+            <div className="flex flex-col gap-4 w-1/2">
+              <div className="flex flex-row gap-4 w-100 bg-sky-100 px-20 py-4 rounded-xl">
+                <div className="flex flex-col justify-center py-4 gap-2 w-1/2">
+                  <p className="text-2xl font-bold">Estado de Recuento</p>
+
+                  <div className="pl-2">
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p>Mesas esperadas:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          <p>{estadoRecuento.mesasEsperadas}</p>
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p className="inline-block">Mesas totalizadas:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {estadoRecuento.mesasTotalizadas}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p className="inline-block">Porcentaje Totalizado:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {estadoRecuento.mesasTotalizadas}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center align-center py-10">
+                  <PorcentPieChart
+                    dataPieLabels={["si", "no"]}
+                    dataPieValues={[
+                      estadoRecuento.mesasTotalizadasPorcentaje,
+                      100 - estadoRecuento.mesasTotalizadasPorcentaje,
+                    ]}
+                    dataPieTitle="Porcentaje totalizado"
+                  />
+                </div>
+              </div>
+              <div className=" flex flex-row gap-4 w-100 bg-sky-100 px-20 py-4 rounded-xl">
+                <div className="flex flex-col justify-center py-4 gap-2 w-1/2">
+                  <p className="text-2xl font-bold">Totalizaciones</p>
+
+                  <div className="pl-2">
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p>Cantidad De Electores:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          <p>{estadoRecuento.cantidadElectores}</p>
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p className="inline-block">Cantidad de Votantes:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {estadoRecuento.cantidadVotantes}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p className="inline-block">Participacion:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {estadoRecuento.participacionPorcentaje}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center align-center py-10">
+                  <PorcentPieChart
+                    dataPieLabels={["si", "no"]}
+                    dataPieValues={[
+                      estadoRecuento.participacionPorcentaje,
+                      100 - estadoRecuento.participacionPorcentaje,
+                    ]}
+                    dataPieTitle="Porcentaje totalizado"
+                  />
+                </div>
+              </div>
+
+              <div className=" flex flex-row gap-4 w-100 bg-sky-100 px-10 py-4 rounded-xl">
+                <div className="flex flex-col justify-center py-4 gap-2 w-1/2">
+                  <p className="text-2xl font-bold inline-block">
+                    Valores Totalizados Otros
+                  </p>
+
+                  <div className="pl-2">
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p>Votos Nulos:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          <p>{valoresTotalizadosOtros.votosNulos || 0}</p>
+                        </span>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          <p>
+                            {valoresTotalizadosOtros.votosNulosPorcentaje || 0}%
+                          </p>
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p className="inline-block"> Votos en Blanco: </p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {valoresTotalizadosOtros.votosEnBlanco || 0}
+                        </span>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {valoresTotalizadosOtros.votosEnBlancoPorcentaje || 0}
+                          %
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-row">
+                      <div className="w-2/3">
+                        <p className="inline-block"> Votos Impugnados:</p>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {valoresTotalizadosOtros.votosRecurridosComandoImpugnados ||
+                            0}
+                        </span>
+                      </div>
+                      <div className="w-2/6">
+                        <span className="inline-block font-bold">
+                          {valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentajes ||
+                            0}
+                          %
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex justify-center align-center py-10">
+                  <PorcentPieChart
+                    dataPieLabels={["a", "b", "c"]}
+                    dataPieValues={[
+                      valoresTotalizadosOtros.votosNulosPorcentaje,
+                      valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentajes,
+                      valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje,
+                    ]}
+                    dataPieTitle="Porcentaje totalizado"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex border-4 w-1/2 p-14">
+              <PieChartGeneral
+                dataPieTitle={"Porcentaje de votos"}
+                dataPieLabels={dataPieLabels}
+                dataPieValues={dataPieValues}
+              />
+            </div>
           </div>
-        </figure>
-        <figure className="flex bg-sky-100 rounded-xl p-8 md:p-0 ">
-          <p className="py-4 text-1xl font-bold">Totalizaciones</p>
-          <div>Cantidad De Electores: {estadoRecuento.cantidadElectores}</div>
-          <div>Cantidad de Votantes: {estadoRecuento.cantidadVotantes}</div>
-          <div>Participacion: {estadoRecuento.participacionPorcentaje} %</div>
-        </figure>
-        <figure className="flex bg-sky-100 rounded-xl p-8 md:p-0 ">
-          <p className="py-4 text-1xl font-bold">
-            Valores ValoresTotalizados Otros
-          </p>
-          <div>
-            Votos Nulos: {valoresTotalizadosOtros.votosNulos}
-            {" - "}
-            {valoresTotalizadosOtros.votosNulosPorcentaje}%
-          </div>
-          <div>
-            Votos en Blanco: {valoresTotalizadosOtros.votosEnBlanco}
-            {" - "}
-            {valoresTotalizadosOtros.votosEnBlancoPorcentaje}%
-          </div>
-          <div>
-            Votos Impugnados:
-            {valoresTotalizadosOtros.votosRecurridosComandoImpugnados}
-            {" - "}
-            {valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje}
-            %
-          </div>
-          <div>
-            <PorcentPieChart
-              dataPieLabels={["si", "no"]}
-              dataPieValues={[
-                valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje,
-                100 -
-                  valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje,
-              ]}
-              dataPieTitle="Porcentaje totalizado"
-            />
-          </div>
-        </figure>
-        <div>
-          {/* <MyLineChart data={data2} /> */}
-          <PieChartGeneral
-            dataPieTitle={"Porcentaje de votos"}
-            dataPieLabels={dataPieLabels}
-            dataPieValues={dataPieValues}
-          />
-          {/*  <AreaChart />*/}
-        </div>
-      </article>
+        </article>
+      )}
     </section>
   );
 }
