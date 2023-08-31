@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        <main className="m-auto grid min-h-screen grid-rows-[60px,1fr,40px]">
+        <main className="m-auto grid min-h-screen grid-rows-[60px,1fr,40px] bg-slate-200">
           <nav className="flex items-center justify-center bg-blue-400">
             <HeaderBar />
           </nav>

@@ -47,7 +47,7 @@ export default function Home() {
           </div>
           <div className="flex flex-row gap-4">
             <div className="flex flex-col gap-4 w-1/2">
-              <div className="flex flex-row gap-4 w-100 bg-sky-100 px-20 py-4 rounded-xl">
+              <div className="flex flex-row gap-4 w-100 bg-sky-100 px-10 py-4 rounded-xl">
                 <div className="flex flex-col justify-center py-4 gap-2 w-1/2">
                   <p className="text-2xl font-bold">Estado de Recuento</p>
 
@@ -95,7 +95,7 @@ export default function Home() {
                   />
                 </div>
               </div>
-              <div className=" flex flex-row gap-4 w-100 bg-sky-100 px-20 py-4 rounded-xl">
+              <div className=" flex flex-row gap-4 w-100 bg-sky-100 px-10 py-4 rounded-xl">
                 <div className="flex flex-col justify-center py-4 gap-2 w-1/2">
                   <p className="text-2xl font-bold">Totalizaciones</p>
 
