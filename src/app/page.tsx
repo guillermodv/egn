@@ -1,26 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  GeneralResult,
-  ValoresTotalizadosOtros,
-} from "./components/interfaces";
+import axios from "axios";
+import { GeneralResult } from "./components/interfaces";
 import { PieChartGeneral } from "./components/pieChartGeneral";
 import { PorcentPieChart } from "./components/porcentPieChart";
 import LoadingIndicator from "./components/loadingIndicator";
 import TitleMain from "./components/titleMain";
+import { PorcentPieChartOthers } from "./components/porcentPieChartOthers";
 
 const url =
   "https://resultados.mininterior.gob.ar/api/resultados/getResultados?anioEleccion=2019&tipoRecuento=1&tipoEleccion=1&categoriaId=2&distritoId=1&seccionProvincialId=0&seccionId=3&circuitoId=000039&mesaId=1244";
 
 export default function Home() {
-  const [arrivedData, setArrivedData] = useState([]);
+  const [arrivedData, setArrivedData] = useState<GeneralResult>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => setArrivedData(data));
+    axios
+      .get(url)
+      .then((response: any) => {
+        setArrivedData(response.data);
+        setIsLoading(false);
+      })
+      .catch((err) => console.error(err));
   }, []);
-  const answerForServer: any = arrivedData;
+
+  console.log("first response", arrivedData);
+  const answerForServer: GeneralResult = arrivedData;
 
   const {
     fechaTotalizacion,
@@ -39,8 +45,8 @@ export default function Home() {
 
   return (
     <section className="flex p-4 items-center justify-center">
-      {answerForServer?.length === 0 && <LoadingIndicator />}
-      {answerForServer?.length !== 0 && (
+      {isLoading && <LoadingIndicator />}
+      {!isLoading && (
         <article className="flex flex-col gap-4 w-100">
           <div className="p-4 uppercase">
             <TitleMain fechaTotalizacion={fechaTotalizacion} />
@@ -196,7 +202,7 @@ export default function Home() {
                       </div>
                       <div className="w-2/6">
                         <span className="inline-block font-bold">
-                          {valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentajes ||
+                          {valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje ||
                             0}
                           %
                         </span>
@@ -205,11 +211,11 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex justify-center align-center py-10">
-                  <PorcentPieChart
-                    dataPieLabels={["a", "b", "c"]}
+                  <PorcentPieChartOthers
+                    dataPieLabels={["Nulos", "Blancos", "Impugnados"]}
                     dataPieValues={[
                       valoresTotalizadosOtros.votosNulosPorcentaje,
-                      valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentajes,
+                      valoresTotalizadosOtros.votosEnBlancoPorcentaje,
                       valoresTotalizadosOtros.votosRecurridosComandoImpugnadosPorcentaje,
                     ]}
                     dataPieTitle="Porcentaje totalizado"
