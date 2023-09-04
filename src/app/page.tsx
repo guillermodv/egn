@@ -4,9 +4,10 @@ import axios from "axios";
 import { GeneralResult } from "./components/interfaces";
 import { PieChartGeneral } from "./components/pieChartGeneral";
 import { PorcentPieChart } from "./components/porcentPieChart";
-import LoadingIndicator from "./components/loadingIndicator";
+import LoadingIndicator from "./components/loading";
 import TitleMain from "./components/titleMain";
 import { PorcentPieChartOthers } from "./components/porcentPieChartOthers";
+import ArgentineMap from "./components/Map";
 
 const url =
   "https://resultados.mininterior.gob.ar/api/resultados/getResultados?anioEleccion=2019&tipoRecuento=1&tipoEleccion=1&categoriaId=2&distritoId=1&seccionProvincialId=0&seccionId=3&circuitoId=000039&mesaId=1244";
@@ -48,7 +49,7 @@ export default function Home() {
       {isLoading && <LoadingIndicator />}
       {!isLoading && (
         <article className="flex flex-col gap-4 w-100">
-          <div className="p-4 uppercase">
+          <div className="p-4">
             <TitleMain fechaTotalizacion={fechaTotalizacion} />
           </div>
           <div className="flex flex-row gap-4">
@@ -223,12 +224,17 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="flex border-4 w-1/2 p-14">
-              <PieChartGeneral
-                dataPieTitle={"Porcentaje de votos"}
-                dataPieLabels={dataPieLabels}
-                dataPieValues={dataPieValues}
-              />
+            <div className="flx flex-col">
+              <div className="flex border-4  p-14">
+                <PieChartGeneral
+                  dataPieTitle={"Porcentaje de votos"}
+                  dataPieLabels={dataPieLabels}
+                  dataPieValues={dataPieValues}
+                />
+              </div>
+              <div className="flex border-4 p-14">
+                <ArgentineMap />
+              </div>
             </div>
           </div>
         </article>
