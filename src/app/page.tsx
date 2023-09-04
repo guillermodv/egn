@@ -13,6 +13,7 @@ const url =
   "https://resultados.mininterior.gob.ar/api/resultados/getResultados?anioEleccion=2019&tipoRecuento=1&tipoEleccion=1&categoriaId=2&distritoId=1&seccionProvincialId=0&seccionId=3&circuitoId=000039&mesaId=1244";
 
 export default function Home() {
+  // @ts-expect-error
   const [arrivedData, setArrivedData] = useState<GeneralResult>({});
   const [isLoading, setIsLoading] = useState(true);
 
