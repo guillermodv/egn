@@ -27,7 +27,6 @@ export default function Home() {
       .catch((err) => console.error(err));
   }, []);
 
-  console.log("first response", arrivedData);
   const answerForServer: GeneralResult = arrivedData;
 
   const {
